@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using oksei_fsot_api.src.Domain.Entities.Shared;
 
 namespace webApiTemplate.src.App.IService

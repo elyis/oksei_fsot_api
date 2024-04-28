@@ -40,24 +40,40 @@ namespace oksei_fsot_api.src.Infrastructure.Repository
                     .ThenInclude(e => e.Appraiser)
                 .FirstOrDefaultAsync(e => e.Id == id);
 
-        public async Task<List<MarkModel>> GetMarksByMonth(Guid userId, int monthIndex)
+        public async Task<MarkModel?> GetAsync(Guid criterionId, Guid teacherId, int monthIndex, int year)
+        {
+            return await _context.Marks
+                .Include(e => e.EvaluatedAppraiser)
+                .FirstOrDefaultAsync(e =>
+                    e.CriterionId == criterionId &&
+                    e.EvaluatedAppraiser.EvaluatedId == teacherId &&
+                    e.Date.Month == monthIndex &&
+                    e.Date.Year == year
+            );
+        }
+
+        public async Task<List<MarkModel>> GetMarksByMonth(Guid userId, int monthIndex, int year)
         {
             var marks = await _context.Marks
                 .Include(e => e.EvaluatedAppraiser.Evaluated)
                 .Include(e => e.EvaluatedAppraiser.Appraiser)
                 .Where(e =>
+                    e.Date.Year == year &&
                     e.Date.Month == monthIndex &&
                     e.EvaluatedAppraiser.Evaluated.Id == userId)
                 .ToListAsync();
             return marks;
         }
 
-        public async Task<List<MarkModel>> GetMarksByMonth(int monthIndex)
+        public async Task<List<MarkModel>> GetMarksByMonth(int monthIndex, int year)
         {
             var marks = await _context.Marks
                 .Include(e => e.EvaluatedAppraiser.Evaluated)
                 .Include(e => e.EvaluatedAppraiser.Appraiser)
-                .Where(e => e.Date.Month == monthIndex)
+                .Where(e =>
+                    e.Date.Month == monthIndex &&
+                    e.Date.Year == year
+                )
                 .ToListAsync();
             return marks;
         }

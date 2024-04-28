@@ -9,7 +9,5 @@ namespace oksei_fsot_api.src.Domain.Enums
         Director,
         Appraiser,
         Teacher,
-        Admin,
-        Organization
     }
 }

@@ -8,7 +8,8 @@ namespace oksei_fsot_api.src.Utility
             if (result == null)
                 return null;
 
-            string timestamp = DateTime.Now.ToString("yyyyMMddHHmmssfff");
+            DateTime.Now.ToString("t");
+            string timestamp = DateTime.Now.ToString("yyyyMMddHH");
             var login = string.Concat(result, timestamp);
             return login;
         }

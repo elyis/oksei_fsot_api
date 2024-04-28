@@ -31,6 +31,8 @@ namespace oksei_fsot_api.src.Utility
             {'ц' ,"c"},
             {'ч' ,"ch"},
             {'ш' ,"sh"},
+            {'ь', ""},
+            {'ъ', ""},
             {'щ' ,"shh"},
             {'ы' ,"y"},
             {'э' ,"e"},

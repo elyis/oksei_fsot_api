@@ -16,10 +16,10 @@ namespace oksei_fsot_api.src.Infrastructure.Data
         public DbSet<MarkModel> Marks { get; set; }
         public DbSet<CriterionModel> Criterions { get; set; }
         public DbSet<MarkLogModel> MarkLogs { get; set; }
+        public DbSet<CriterionEvaluationOption> CriterionEvaluationOptions { get; set; }
         public DbSet<ReportTeacherModel> ReportTeachers { get; set; }
         public DbSet<EvaluatedAppraiserModel> EvaluatedAppraisers { get; set; }
         public DbSet<PremiumReportModel> PremiumReports { get; set; }
-        public DbSet<OrganizationModel> Organizations { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

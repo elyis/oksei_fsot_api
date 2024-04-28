@@ -9,11 +9,10 @@ namespace oksei_fsot_api.src.Domain.Models
         public Guid Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
-        public int LowerBound { get; set; } = 1;
-        public int UpperBound { get; set; } = 5;
-        public int SerialNumber { get; set; }
+        public string SerialNumber { get; set; }
 
-        public ICollection<MarkModel> Marks { get; set; }
+        public List<CriterionEvaluationOption> EvaluationOptions { get; set; } = new();
+        public List<MarkModel> Marks { get; set; } = new();
 
         public CriterionBody ToCriterionBody()
         {
@@ -22,8 +21,8 @@ namespace oksei_fsot_api.src.Domain.Models
                 Id = Id,
                 Description = Description,
                 Name = Name,
-                LowerBound = LowerBound,
-                UpperBound = UpperBound,
+                SerialNumber = SerialNumber,
+                EvaluationOptions = EvaluationOptions.OrderByDescending(e => e.CountPoints).Select(e => e.ToEvaluationOptionResult()).ToList(),
             };
         }
     }

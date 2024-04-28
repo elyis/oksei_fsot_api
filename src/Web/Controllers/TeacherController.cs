@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using oksei_fsot_api.src.Domain.Entities.Response;
 using oksei_fsot_api.src.Domain.IRepository;
@@ -23,12 +24,13 @@ namespace oksei_fsot_api.src.Web.Controllers
         [HttpGet("teachers/{monthIndex}")]
         public async Task<IActionResult> GetAllTeacher(
             [FromHeader(Name = "Authorization")] string token,
-            int monthIndex)
+            [FromQuery, Range(1, 12)] int monthIndex,
+            [FromQuery] int year
+        )
         {
             var tokenInfo = _jwtService.GetTokenInfo(token);
 
-            var teacherRating = await _userRepository.GetTeacherRatingSummariesAsync(monthIndex, tokenInfo.OrganizationId);
-
+            var teacherRating = await _userRepository.GetTeacherRatingSummariesAsync(monthIndex, year);
             var teachers = teacherRating.Select(e =>
             new TeacherBody
             {

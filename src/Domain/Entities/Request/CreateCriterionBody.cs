@@ -1,6 +1,4 @@
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using RangeAttribute = System.ComponentModel.DataAnnotations.RangeAttribute;
 
 namespace oksei_fsot_api.src.Domain.Entities.Request
 {
@@ -11,15 +9,20 @@ namespace oksei_fsot_api.src.Domain.Entities.Request
 
         [Required]
         public string Description { get; set; }
+        public string SerialNumber { get; set; }
+        public List<EvaluationOption> EvaluationOptions { get; set; } = new();
+    }
 
-        [DefaultValue(1)]
-        [Range(1, int.MaxValue)]
-        public int LowerBound { get; set; } = 1;
+    public class EvaluationOption
+    {
+        public string Description { get; set; }
+        public int CountPoints { get; set; } = 0;
+    }
 
-        [DefaultValue(5)]
-        [Range(1, int.MaxValue)]
-        public int UpperBound { get; set; } = 5;
-
-        public int SerialNumber { get; set; }
+    public class EvaluationOptionResult
+    {
+        public Guid Id { get; set; }
+        public string Description { get; set; }
+        public int CountPoints { get; set; } = 0;
     }
 }

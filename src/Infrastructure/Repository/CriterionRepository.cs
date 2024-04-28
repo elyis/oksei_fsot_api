@@ -21,12 +21,20 @@ namespace oksei_fsot_api.src.Infrastructure.Repository
             if (criterion != null)
                 return null;
 
+            var criterionEvaluationOptions = body.EvaluationOptions
+                .Select(e => new CriterionEvaluationOption
+                {
+                    CountPoints = e.CountPoints,
+                    Description = e.Description,
+                })
+                .ToList();
+
             var newCriterion = new CriterionModel
             {
                 Description = body.Description,
                 Name = body.Name,
-                LowerBound = body.LowerBound,
-                UpperBound = body.UpperBound,
+                SerialNumber = body.SerialNumber,
+                EvaluationOptions = criterionEvaluationOptions
             };
 
             var result = await _context.Criterions.AddAsync(newCriterion);
@@ -34,12 +42,16 @@ namespace oksei_fsot_api.src.Infrastructure.Repository
             return result?.Entity;
         }
 
-        public async Task<List<CriterionModel>> GetAllAsync()
+        public async Task<List<CriterionModel>> GetAllAsync(int count, int offset)
             => await _context.Criterions
+                .Include(e => e.EvaluationOptions)
+                .Skip(offset)
+                .Take(count)
                 .ToListAsync();
 
         public async Task<CriterionModel?> GetAsync(Guid id)
             => await _context.Criterions
+                .Include(e => e.EvaluationOptions)
                 .FirstOrDefaultAsync(e => e.Id == id);
 
         public async Task<bool> RemoveAsync(Guid id)
@@ -51,6 +63,56 @@ namespace oksei_fsot_api.src.Infrastructure.Repository
                 await _context.SaveChangesAsync();
             }
             return true;
+        }
+
+        public async Task<bool> RemoveCriterionEvaluation(Guid id)
+        {
+            var criterionEvaluation = await _context.CriterionEvaluationOptions.FirstOrDefaultAsync(e => e.Id == id);
+            if (criterionEvaluation == null)
+                return true;
+
+            _context.CriterionEvaluationOptions.Remove(criterionEvaluation);
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
+        public async Task<CriterionEvaluationOption?> AddCriterionEvaluationOption(EvaluationOption evaluationOption, Guid criterionId)
+        {
+            var criterion = await GetAsync(criterionId);
+            if (criterion == null)
+                return null;
+
+            var criterionEvaluationOption = new CriterionEvaluationOption
+            {
+                Description = evaluationOption.Description,
+                CountPoints = evaluationOption.CountPoints,
+                Criterion = criterion,
+            };
+
+            await _context.CriterionEvaluationOptions.AddAsync(criterionEvaluationOption);
+            await _context.SaveChangesAsync();
+
+            return criterionEvaluationOption;
+        }
+
+        public async Task<CriterionModel?> UpdateAsync(UpdateCriterionBody body, Guid id)
+        {
+            var criterion = await GetAsync(id);
+            if (criterion == null)
+                return null;
+
+            criterion.Name = body.Name;
+            criterion.Description = body.Description;
+            await _context.SaveChangesAsync();
+
+            return criterion;
+        }
+
+        public async Task<float> GetCountPointsByCriterions()
+        {
+            var countPoints = await _context.CriterionEvaluationOptions.SumAsync(e => e.CountPoints);
+            return countPoints;
         }
     }
 }

@@ -3,7 +3,6 @@ using oksei_fsot_api.src.Domain.Entities.Request;
 using oksei_fsot_api.src.Domain.IRepository;
 using Microsoft.AspNetCore.Mvc;
 using webApiTemplate.src.App.IService;
-using webApiTemplate.src.App.Provider;
 using oksei_fsot_api.src.Domain.Entities.Response;
 using oksei_fsot_api.src.Domain.Enums;
 using oksei_fsot_api.src.Domain.Entities.Shared;
@@ -14,17 +13,14 @@ namespace oksei_fsot_api.src.App.Service
     public class AuthService : IAuthService
     {
         private readonly IUserRepository _userRepository;
-        private readonly IOrganizationRepository _organizationRepository;
         private readonly IJwtService _jwtService;
 
         public AuthService(
             IUserRepository userRepository,
-            IOrganizationRepository organizationRepository,
             IJwtService jwtService
         )
         {
             _userRepository = userRepository;
-            _organizationRepository = organizationRepository;
             _jwtService = jwtService;
         }
 
@@ -34,7 +30,7 @@ namespace oksei_fsot_api.src.App.Service
             if (oldUser == null)
                 return new NotFoundResult();
 
-            var userCredentials = await GetUserCredentials(oldUser.Id, oldUser.RoleName, oldUser.OrganizationId);
+            var userCredentials = await GetUserCredentials(oldUser.Id, oldUser.RoleName);
             return new OkObjectResult(userCredentials);
         }
 
@@ -44,36 +40,27 @@ namespace oksei_fsot_api.src.App.Service
             if (oldUser == null)
                 return new NotFoundResult();
 
-            var inputPasswordHash = Hmac512Provider.Compute(body.Password);
-            if (oldUser.Password != inputPasswordHash)
-                return new BadRequestResult();
-
-            var userCredentials = await GetUserCredentials(oldUser.Id, oldUser.RoleName, oldUser.OrganizationId);
+            var userCredentials = await GetUserCredentials(oldUser.Id, oldUser.RoleName);
             return new OkObjectResult(userCredentials);
         }
 
 
 
-        public async Task<IActionResult> SignUp(SignUpBody body, Guid organizationId)
+        public async Task<IActionResult> SignUp(SignUpBody body)
         {
-            var organization = await _organizationRepository.GetAsync(organizationId);
-            if (organization == null)
-                return new BadRequestResult();
-
-            var oldUser = await _userRepository.AddAsync(body, organization);
+            var oldUser = await _userRepository.AddAsync(body);
             if (oldUser == null)
                 return new ConflictResult();
 
             var roleName = Enum.GetName(typeof(UserRole), body.Role);
-            var userCredentials = await GetUserCredentials(oldUser.Id, roleName, oldUser.OrganizationId);
+            var userCredentials = await GetUserCredentials(oldUser.Id, roleName);
             return new OkObjectResult(userCredentials);
         }
 
-        private async Task<UserCredentials?> GetUserCredentials(Guid userId, string role, Guid organizationId)
+        private async Task<UserCredentials?> GetUserCredentials(Guid userId, string role)
         {
             var tokenInfo = new TokenInfo
             {
-                OrganizationId = organizationId,
                 Role = Enum.Parse<UserRole>(role),
                 UserId = userId
             };

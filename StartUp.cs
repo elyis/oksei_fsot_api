@@ -10,6 +10,9 @@ using webApiTemplate.src.App.Provider;
 using webApiTemplate.src.Domain.Entities.Config;
 using oksei_fsot_api.src.Utility;
 using oksei_fsot_api.src.Domain.Entities.Response;
+using Microsoft.EntityFrameworkCore;
+using oksei_fsot_api.src.Domain.Models;
+using oksei_fsot_api.src.Domain.Enums;
 
 namespace oksei_fsot_api
 {
@@ -85,6 +88,8 @@ namespace oksei_fsot_api
                 options.EnableAnnotations();
             });
 
+            services.AddSwaggerGenNewtonsoftSupport();
+
             services.AddSingleton(jwtSettings);
             services.AddSingleton(aes256Settings);
 
@@ -147,7 +152,26 @@ namespace oksei_fsot_api
             app.UseAuthorization();
 
             app.MapControllers();
+            InitDatabase();
             app.Run();
+        }
+
+        private void InitDatabase()
+        {
+            var context = new AppDbContext(new DbContextOptions<AppDbContext>(), _config);
+            var admin = context.Users.FirstOrDefault(e => e.Login == "torvalid1969");
+            if (admin == null)
+            {
+                var user = new UserModel
+                {
+                    Login = "torvalid1969",
+                    Password = "roottoor",
+                    Fullname = "Админ Админ Админович",
+                    RoleName = UserRole.Appraiser.ToString(),
+                };
+                context.Users.Add(user);
+                context.SaveChanges();
+            }
         }
     }
 }

@@ -39,7 +39,6 @@ namespace webApiTemplate.src.App.Service
         {
             var claims = new Dictionary<string, string>{
                 { nameof(TokenInfo.UserId), tokenInfo.UserId.ToString() },
-                { nameof(TokenInfo.OrganizationId), tokenInfo.OrganizationId.ToString()},
                 { ClaimTypes.Role, Enum.GetName(typeof(UserRole), tokenInfo.Role)!},
             };
             var timeSpan = new TimeSpan(2, 0, 0, 0);
@@ -62,7 +61,6 @@ namespace webApiTemplate.src.App.Service
 
             var tokenInfo = new TokenInfo
             {
-                OrganizationId = Guid.Parse(claims.First(e => e.Type == nameof(TokenInfo.OrganizationId)).Value),
                 Role = Enum.Parse<UserRole>(claims.First(e => e.Type == ClaimTypes.Role).Value),
                 UserId = Guid.Parse(claims.First(e => e.Type == nameof(TokenInfo.UserId)).Value)
             };

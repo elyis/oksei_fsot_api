@@ -11,14 +11,17 @@ namespace oksei_fsot_api.src.Web.Controllers
     public class StatsController : ControllerBase
     {
         private readonly IUserRepository _userRepository;
+        private readonly ICriterionRepository _criterionRepository;
         private readonly IJwtService _jwtService;
 
         public StatsController(
             IUserRepository userRepository,
+            ICriterionRepository criterionRepository,
             IJwtService jwtService
         )
         {
             _userRepository = userRepository;
+            _criterionRepository = criterionRepository;
             _jwtService = jwtService;
         }
 
@@ -31,10 +34,10 @@ namespace oksei_fsot_api.src.Web.Controllers
 
             var currentDate = DateTime.UtcNow;
             var previousMonthDate = currentDate.AddMonths(-1);
-            const float maxMarkValue = 54.0f;
+            float countPointsByCriterions = await _criterionRepository.GetCountPointsByCriterions();
 
-            var teacherRatingCurrentMonth = await _userRepository.GetTeacherRatingSummariesAsync(currentDate.Month, tokenInfo.OrganizationId);
-            var teacherRatingPreviousMonth = await _userRepository.GetTeacherRatingSummariesAsync(previousMonthDate.Month, tokenInfo.OrganizationId);
+            var teacherRatingCurrentMonth = await _userRepository.GetTeacherRatingSummariesAsync(currentDate.Month, currentDate.Year);
+            var teacherRatingPreviousMonth = await _userRepository.GetTeacherRatingSummariesAsync(previousMonthDate.Month, previousMonthDate.Year);
 
             var CreateMonthStats = (IEnumerable<TeacherRatingSummary> ratings, bool isUnderway) =>
             {
@@ -46,7 +49,7 @@ namespace oksei_fsot_api.src.Web.Controllers
                     RatingTeachers = ratings.Select(e => e.TeacherFullname).ToList(),
                     UnderWay = isUnderway,
                     LastChange = ratings.OrderByDescending(e => e.LastAssessment).FirstOrDefault()?.LastAssessment,
-                    Progress = (float)Math.Floor((float)ratings.Sum(e => e.TotalRating) / ((float)ratings.Count() * maxMarkValue) * 100f)
+                    Progress = (float)Math.Floor((float)ratings.Sum(e => e.TotalRating) / (ratings.Count() * countPointsByCriterions) * 100f)
                 };
             };
 

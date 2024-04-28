@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using oksei_fsot_api.src.App.IService;
 using oksei_fsot_api.src.Domain.Entities.Request;
@@ -39,6 +40,10 @@ namespace oksei_fsot_api.src.App.Service
 
             var appraiser = await _userRepository.GetAsync(appraiserId);
             var evaluatedAppraiser = await _evaluatedAppraiserRepository.AddOrGetAsync(appraiser, evaluatedUser);
+
+            var mark = await _markRepository.GetAsync(criterionId, evaluatedUser.Id, createMarkBody.Date.Month, createMarkBody.Date.Year);
+            if (mark != null)
+                return new ConflictResult();
 
             var result = await _markRepository.AddAsync(criterion, evaluatedAppraiser, createMarkBody);
             if (result == null)

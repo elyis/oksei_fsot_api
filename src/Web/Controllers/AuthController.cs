@@ -5,6 +5,8 @@ using Swashbuckle.AspNetCore.Annotations;
 using oksei_fsot_api.src.Utility;
 using oksei_fsot_api.src.Domain.Entities.Response;
 using webApiTemplate.src.App.IService;
+using Microsoft.AspNetCore.Authorization;
+using oksei_fsot_api.src.Domain.Enums;
 
 
 namespace oksei_fsot_api.src.Web.Controllers
@@ -16,35 +18,29 @@ namespace oksei_fsot_api.src.Web.Controllers
         private readonly IAuthService _authService;
         private readonly PasswordGenerator _passwordGenerator;
         private readonly LoginGenerator _loginGenerator;
-        private readonly IJwtService _jwtService;
 
 
         public AuthController(
             IAuthService authService,
-            IJwtService jwtService,
             PasswordGenerator passwordGenerator,
             LoginGenerator loginGenerator
         )
         {
             _authService = authService;
-            _jwtService = jwtService;
             _passwordGenerator = passwordGenerator;
             _loginGenerator = loginGenerator;
         }
 
-        [HttpPost("signup")]
+        [HttpPost("signup"), Authorize(Roles = nameof(UserRole.Appraiser))]
         [SwaggerOperation("Зарегистрировать аккаунт сотрудника")]
         [SwaggerResponse(200, "Успешно", Type = typeof(LoginBody))]
         [SwaggerResponse(400, Description = "Неверный формат имени или в нем есть символы, кроме русских")]
         [SwaggerResponse(409, "Логин уже существует")]
 
         public async Task<IActionResult> SignUpEmployee(
-            [FromHeader(Name = "Authorization")] string token,
             SignUpEmployeeBody body
         )
         {
-            var tokenInfo = _jwtService.GetTokenInfo(token);
-
             if (string.IsNullOrWhiteSpace(body.Fullname))
                 return BadRequest();
 
@@ -66,19 +62,23 @@ namespace oksei_fsot_api.src.Web.Controllers
                 Role = body.Role
             };
 
-            var result = await _authService.SignUp(signUpBody, tokenInfo.OrganizationId);
+            var result = await _authService.SignUp(signUpBody);
             if (result is OkObjectResult okObjectResult)
             {
-                var userCredentialsWithLogin = new UserCredentialsWithLogin
+                // var userCredentials = (UserCredentials)okObjectResult.Value;
+                var loginBody = new LoginBody
                 {
-                    UserCredentials = (UserCredentials)okObjectResult.Value!,
-                    LoginBody = {
-                        Login = login,
-                        Password = password
-                    },
+                    Login = login,
+                    Password = password
                 };
 
-                return Ok(userCredentialsWithLogin);
+                // var userCredentialsWithLogin = new UserCredentialsWithLogin
+                // {
+                //     UserCredentials = userCredentials,
+                //     LoginBody = loginBody,
+                // };
+
+                return Ok(loginBody);
             }
 
             return BadRequest();
