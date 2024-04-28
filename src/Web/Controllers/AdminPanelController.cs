@@ -52,7 +52,7 @@ namespace oksei_fsot_api.src.Web.Controllers
             var year = DateTime.UtcNow.Year;
             var headers = new string[] { "ФИО", "Число очков", "Размер премии" };
 
-            var teacherPerformanceSummaries = await _userRepository.UpdateTeacherPerformanceSummary(monthIndex, reportData);
+            var teacherPerformanceSummaries = await _userRepository.UpdateTeacherPerformanceSummary(monthIndex, reportData, year);
 
             var monthName = CultureInfo.GetCultureInfo("ru-RU").DateTimeFormat.GetMonthName(monthIndex);
             var filename = $"{monthName}{year}.xlsx";
