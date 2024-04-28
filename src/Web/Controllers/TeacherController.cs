@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using oksei_fsot_api.src.Domain.Entities.Response;
 using oksei_fsot_api.src.Domain.IRepository;
+using Swashbuckle.AspNetCore.Annotations;
 using webApiTemplate.src.App.IService;
 
 namespace oksei_fsot_api.src.Web.Controllers
@@ -21,7 +22,9 @@ namespace oksei_fsot_api.src.Web.Controllers
             _jwtService = jwtService;
         }
 
-        [HttpGet("teachers/{monthIndex}")]
+        [HttpGet("teachers")]
+        [SwaggerOperation("Получить рейтинг преподавателей за месяц")]
+        [SwaggerResponse(200, Type = typeof(IEnumerable<TeacherBody>))]
         public async Task<IActionResult> GetAllTeacher(
             [FromHeader(Name = "Authorization")] string token,
             [FromQuery, Range(1, 12)] int monthIndex,

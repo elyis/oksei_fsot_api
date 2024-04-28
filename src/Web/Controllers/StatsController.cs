@@ -2,6 +2,7 @@ using System.Globalization;
 using Microsoft.AspNetCore.Mvc;
 using oksei_fsot_api.src.Domain.Entities.Response;
 using oksei_fsot_api.src.Domain.IRepository;
+using Swashbuckle.AspNetCore.Annotations;
 using webApiTemplate.src.App.IService;
 
 namespace oksei_fsot_api.src.Web.Controllers
@@ -26,6 +27,8 @@ namespace oksei_fsot_api.src.Web.Controllers
         }
 
         [HttpGet]
+        [SwaggerOperation("Получить статистику за текущий и предыдущий месяц")]
+        [SwaggerResponse(200, Type = typeof(CurrentAndPreviousMonthInfo))]
         public async Task<IActionResult> GetStatsByCurrentAndPreviousMonth(
             [FromHeader(Name = "Authorization")] string token
         )
