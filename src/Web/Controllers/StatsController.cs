@@ -42,9 +42,9 @@ namespace oksei_fsot_api.src.Web.Controllers
             var teacherRatingCurrentMonth = await _userRepository.GetTeacherRatingSummariesAsync(currentDate.Month, currentDate.Year);
             var teacherRatingPreviousMonth = await _userRepository.GetTeacherRatingSummariesAsync(previousMonthDate.Month, previousMonthDate.Year);
 
-            var CreateMonthStats = (IEnumerable<TeacherRatingSummary> ratings, bool isUnderway) =>
+            var CreateMonthStats = (IEnumerable<TeacherRatingSummary> ratings, bool isUnderway, int monthIndex) =>
             {
-                var monthName = CultureInfo.GetCultureInfo("ru-RU").DateTimeFormat.GetMonthName(currentDate.Month);
+                var monthName = CultureInfo.GetCultureInfo("ru-RU").DateTimeFormat.GetMonthName(monthIndex);
 
                 return new MonthStatsBody
                 {
@@ -56,8 +56,8 @@ namespace oksei_fsot_api.src.Web.Controllers
                 };
             };
 
-            var currentMonthStats = CreateMonthStats(teacherRatingCurrentMonth, true);
-            var previousMonthStats = CreateMonthStats(teacherRatingPreviousMonth, false);
+            var currentMonthStats = CreateMonthStats(teacherRatingCurrentMonth, true, currentDate.Month);
+            var previousMonthStats = CreateMonthStats(teacherRatingPreviousMonth, false, previousMonthDate.Month);
 
             var monthStats = new CurrentAndPreviousMonthInfo
             {
