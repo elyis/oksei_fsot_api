@@ -248,5 +248,9 @@ namespace oksei_fsot_api.src.Infrastructure.Repository
             return result != null;
         }
 
+        public async Task<IEnumerable<UserModel>> GetUsers(string role)
+        {
+            return await _context.Users.Where(e => e.RoleName == role).ToListAsync();
+        }
     }
 }

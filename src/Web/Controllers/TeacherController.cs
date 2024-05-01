@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using oksei_fsot_api.src.Domain.Entities.Response;
+using oksei_fsot_api.src.Domain.Enums;
 using oksei_fsot_api.src.Domain.IRepository;
 using Swashbuckle.AspNetCore.Annotations;
 using webApiTemplate.src.App.IService;
@@ -49,6 +50,16 @@ namespace oksei_fsot_api.src.Web.Controllers
                 teachers.First().IsKing = true;
 
             return Ok(teachers);
+        }
+
+        [HttpGet("teachers")]
+        [SwaggerOperation("Получить список преподаваталей")]
+        [SwaggerResponse(200, Type = typeof(IEnumerable<UserOpenInfoBody>))]
+        public async Task<IActionResult> GetTeachers()
+        {
+            var users = await _userRepository.GetUsers(UserRole.Teacher.ToString());
+            var result = users.Select(e => e.ToUserOpenInfoBody());
+            return Ok(result);
         }
 
 

@@ -1,6 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 using oksei_fsot_api.src.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
+using oksei_fsot_api.src.Domain.Entities.Response;
+using NPOI.SS.Formula.Functions;
 
 namespace oksei_fsot_api.src.Domain.Models
 {
@@ -22,6 +24,25 @@ namespace oksei_fsot_api.src.Domain.Models
 
         public List<EvaluatedAppraiserModel> UserAppraisers { get; set; } = new();
         public List<ReportTeacherModel> Reports { get; set; } = new();
+
+
+        public UserOpenInfoBody ToUserOpenInfoBody()
+        {
+            return new UserOpenInfoBody
+            {
+                Fullname = AbbreviateName(Fullname),
+                Login = Login,
+            };
+        }
+
+        private static string AbbreviateName(string name)
+        {
+            var names = name.Split(' ');
+            if (names.Length == 2)
+                return names[0] + " " + names[1][0] + ".";
+
+            return names[0] + " " + names[1][..1] + ". " + names[^1][..1] + ".";
+        }
 
     }
 }
