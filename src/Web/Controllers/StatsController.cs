@@ -48,8 +48,8 @@ namespace oksei_fsot_api.src.Web.Controllers
 
                 return new MonthStatsBody
                 {
-                    Name = monthName,
-                    RatingTeachers = ratings.Select(e => e.TeacherFullname).ToList(),
+                    Name = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(monthName),
+                    RatingTeachers = ratings.Select(e => AbbreviateName(e.TeacherFullname)).ToList(),
                     UnderWay = isUnderway,
                     LastChange = ratings.OrderByDescending(e => e.LastAssessment).FirstOrDefault()?.LastAssessment,
                     Progress = (float)Math.Floor((float)ratings.Sum(e => e.TotalRating) / (ratings.Count() * countPointsByCriterions) * 100f)
@@ -66,6 +66,15 @@ namespace oksei_fsot_api.src.Web.Controllers
             };
 
             return Ok(monthStats);
+        }
+
+        private static string AbbreviateName(string name)
+        {
+            var names = name.Split(' ');
+            if (names.Length == 2)
+                return names[0] + " " + names[1][0] + ".";
+
+            return names[0] + " " + names[1][..1] + ". " + names[^1][..1] + ".";
         }
     }
 }
