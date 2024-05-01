@@ -32,6 +32,7 @@ namespace oksei_fsot_api.src.Domain.Models
             {
                 Fullname = AbbreviateName(Fullname),
                 Login = Login,
+                Role = Enum.Parse<UserRole>(RoleName)
             };
         }
 

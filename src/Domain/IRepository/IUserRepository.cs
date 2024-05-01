@@ -18,6 +18,6 @@ namespace oksei_fsot_api.src.Domain.IRepository
         Task<string?> UpdateTokenAsync(string newRefreshToken, Guid id);
         Task<bool> RemoveAsync(string login);
         Task<UserModel?> GetByTokenAsync(string refreshTokenHash);
-        Task<IEnumerable<UserModel>> GetUsers(string role);
+        Task<IEnumerable<UserModel>> GetUsers();
     }
 }
