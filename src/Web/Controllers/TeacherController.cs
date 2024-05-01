@@ -23,7 +23,7 @@ namespace oksei_fsot_api.src.Web.Controllers
             _jwtService = jwtService;
         }
 
-        [HttpGet("teachers")]
+        [HttpGet("rating/teachers")]
         [SwaggerOperation("Получить рейтинг преподавателей за месяц")]
         [SwaggerResponse(200, Type = typeof(IEnumerable<TeacherBody>))]
         public async Task<IActionResult> GetAllTeacher(
