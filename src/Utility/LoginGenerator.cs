@@ -9,7 +9,7 @@ namespace oksei_fsot_api.src.Utility
                 return null;
 
             DateTime.Now.ToString("t");
-            string timestamp = DateTime.Now.ToString("yyyyMMddHH");
+            string timestamp = DateTime.Now.ToString("HHmmss");
             var login = string.Concat(result, timestamp);
             return login;
         }
