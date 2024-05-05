@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using Microsoft.AspNetCore.Mvc;
 using oksei_fsot_api.src.Domain.Entities.Response;
@@ -30,16 +31,18 @@ namespace oksei_fsot_api.src.Web.Controllers
         [SwaggerOperation("Получить статистику за текущий и предыдущий месяц")]
         [SwaggerResponse(200, Type = typeof(CurrentAndPreviousMonthInfo))]
         public async Task<IActionResult> GetStatsByCurrentAndPreviousMonth(
-            [FromHeader(Name = "Authorization")] string token
+            [FromHeader(Name = "Authorization")] string token,
+            [FromQuery, Range(1, 12)] int monthIndex
         )
         {
             var tokenInfo = _jwtService.GetTokenInfo(token);
 
             var currentDate = DateTime.UtcNow;
-            var previousMonthDate = currentDate.AddMonths(-1);
+            var newDate = new DateTime(currentDate.Year, monthIndex, currentDate.Day);
+            var previousMonthDate = newDate.AddMonths(-1);
             float countPointsByCriterions = await _criterionRepository.GetCountPointsByCriterions();
 
-            var teacherRatingCurrentMonth = await _userRepository.GetTeacherRatingSummariesAsync(currentDate.Month, currentDate.Year);
+            var teacherRatingCurrentMonth = await _userRepository.GetTeacherRatingSummariesAsync(newDate.Month, newDate.Year);
             var teacherRatingPreviousMonth = await _userRepository.GetTeacherRatingSummariesAsync(previousMonthDate.Month, previousMonthDate.Year);
 
             var CreateMonthStats = (IEnumerable<TeacherRatingSummary> ratings, bool isUnderway, int monthIndex) =>
@@ -56,7 +59,7 @@ namespace oksei_fsot_api.src.Web.Controllers
                 };
             };
 
-            var currentMonthStats = CreateMonthStats(teacherRatingCurrentMonth, true, currentDate.Month);
+            var currentMonthStats = CreateMonthStats(teacherRatingCurrentMonth, true, newDate.Month);
             var previousMonthStats = CreateMonthStats(teacherRatingPreviousMonth, false, previousMonthDate.Month);
 
             var monthStats = new CurrentAndPreviousMonthInfo
