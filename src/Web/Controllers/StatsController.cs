@@ -31,18 +31,16 @@ namespace oksei_fsot_api.src.Web.Controllers
         [SwaggerOperation("Получить статистику за текущий и предыдущий месяц")]
         [SwaggerResponse(200, Type = typeof(CurrentAndPreviousMonthInfo))]
         public async Task<IActionResult> GetStatsByCurrentAndPreviousMonth(
-            [FromHeader(Name = "Authorization")] string token,
-            [FromQuery, Range(1, 12)] int monthIndex
+            [FromHeader(Name = "Authorization")] string token
         )
         {
             var tokenInfo = _jwtService.GetTokenInfo(token);
 
             var currentDate = DateTime.UtcNow;
-            var newDate = new DateTime(currentDate.Year, monthIndex, currentDate.Day);
-            var previousMonthDate = newDate.AddMonths(-1);
+            var previousMonthDate = currentDate.AddMonths(-1);
             float countPointsByCriterions = await _criterionRepository.GetCountPointsByCriterions();
 
-            var teacherRatingCurrentMonth = await _userRepository.GetTeacherRatingSummariesAsync(newDate.Month, newDate.Year);
+            var teacherRatingCurrentMonth = await _userRepository.GetTeacherRatingSummariesAsync(currentDate.Month, currentDate.Year);
             var teacherRatingPreviousMonth = await _userRepository.GetTeacherRatingSummariesAsync(previousMonthDate.Month, previousMonthDate.Year);
 
             var CreateMonthStats = (IEnumerable<TeacherRatingSummary> ratings, bool isUnderway, int monthIndex) =>
@@ -53,13 +51,14 @@ namespace oksei_fsot_api.src.Web.Controllers
                 {
                     Name = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(monthName),
                     RatingTeachers = ratings.Select(e => AbbreviateName(e.TeacherFullname)).ToList(),
+                    Month = monthIndex,
                     UnderWay = isUnderway,
                     LastChange = ratings.OrderByDescending(e => e.LastAssessment).FirstOrDefault()?.LastAssessment,
                     Progress = (float)Math.Floor((float)ratings.Sum(e => e.TotalRating) / (ratings.Count() * countPointsByCriterions) * 100f)
                 };
             };
 
-            var currentMonthStats = CreateMonthStats(teacherRatingCurrentMonth, true, newDate.Month);
+            var currentMonthStats = CreateMonthStats(teacherRatingCurrentMonth, true, currentDate.Month);
             var previousMonthStats = CreateMonthStats(teacherRatingPreviousMonth, false, previousMonthDate.Month);
 
             var monthStats = new CurrentAndPreviousMonthInfo
