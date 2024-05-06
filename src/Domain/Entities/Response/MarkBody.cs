@@ -5,6 +5,6 @@ namespace oksei_fsot_api.src.Domain.Entities.Response
         public Guid Id { get; set; }
         public string AppraiserName { get; set; }
         public DateOnly Date { get; set; }
-        public int Mark { get; set; }
+        public Guid EvaluationId { get; set; }
     }
 }

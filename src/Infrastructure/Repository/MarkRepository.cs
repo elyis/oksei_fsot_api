@@ -16,17 +16,16 @@ namespace oksei_fsot_api.src.Infrastructure.Repository
         }
 
         public async Task<MarkModel?> AddAsync(
-            CriterionModel criterion,
+            CriterionEvaluationOption evaluationOption,
             EvaluatedAppraiserModel evaluatedAppraiser,
             CreateMarkBody markBody
             )
         {
             var mark = new MarkModel
             {
-                Criterion = criterion,
+                Evaluation = evaluationOption,
                 Date = markBody.Date,
                 EvaluatedAppraiser = evaluatedAppraiser,
-                Value = markBody.Mark,
             };
 
             var result = await _context.Marks.AddAsync(mark);
@@ -44,8 +43,9 @@ namespace oksei_fsot_api.src.Infrastructure.Repository
         {
             return await _context.Marks
                 .Include(e => e.EvaluatedAppraiser)
+                .Include(e => e.Evaluation)
                 .FirstOrDefaultAsync(e =>
-                    e.CriterionId == criterionId &&
+                    e.Evaluation.CriterionId == criterionId &&
                     e.EvaluatedAppraiser.EvaluatedId == teacherId &&
                     e.Date.Month == monthIndex &&
                     e.Date.Year == year

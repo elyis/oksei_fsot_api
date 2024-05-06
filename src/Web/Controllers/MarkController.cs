@@ -43,11 +43,11 @@ namespace oksei_fsot_api.src.Web.Controllers
         public async Task<IActionResult> CreateMark(
             [FromHeader(Name = "Authorization")] string token,
             CreateMarkBody markBody,
-            [FromQuery, Required] Guid criterionId
+            [FromQuery, Required] Guid criterionEvaluationId
         )
         {
             var tokenInfo = _jwtService.GetTokenInfo(token);
-            var responseStatusCode = await _createMarkService.Invoke(markBody, criterionId, tokenInfo.UserId);
+            var responseStatusCode = await _createMarkService.Invoke(markBody, criterionEvaluationId, tokenInfo.UserId);
             return responseStatusCode;
         }
 

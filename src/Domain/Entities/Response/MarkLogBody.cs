@@ -6,6 +6,6 @@ namespace oksei_fsot_api.src.Domain.Entities.Response
         public DateOnly Date { get; set; }
         public string AppraiserFullname { get; set; }
         public string TeacherName { get; set; }
-        public int Mark { get; set; }
+        public Guid EvaluationId { get; set; }
     }
 }

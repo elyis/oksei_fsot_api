@@ -7,6 +7,7 @@ namespace oksei_fsot_api.src.Domain.IRepository
     {
         Task<CriterionModel?> AddAsync(CreateCriterionBody body);
         Task<CriterionModel?> GetAsync(Guid id);
+        Task<CriterionEvaluationOption?> GetCriterionEvaluationOptionAsync(Guid id);
         Task<CriterionModel?> UpdateAsync(UpdateCriterionBody body, Guid id);
         Task<bool> RemoveCriterionEvaluation(Guid id);
         Task<bool> RemoveAsync(Guid id);

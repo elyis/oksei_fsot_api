@@ -54,6 +54,12 @@ namespace oksei_fsot_api.src.Infrastructure.Repository
                 .Include(e => e.EvaluationOptions)
                 .FirstOrDefaultAsync(e => e.Id == id);
 
+        public async Task<CriterionEvaluationOption?> GetCriterionEvaluationOptionAsync(Guid id)
+        {
+            return await _context.CriterionEvaluationOptions
+                .FirstOrDefaultAsync(e => e.Id == id);
+        }
+
         public async Task<bool> RemoveAsync(Guid id)
         {
             var criterion = await GetAsync(id);

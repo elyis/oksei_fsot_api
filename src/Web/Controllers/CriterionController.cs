@@ -77,13 +77,13 @@ namespace oksei_fsot_api.src.Web.Controllers
 
         [HttpGet("criterion/{criterionId}")]
         [SwaggerOperation("Получить критерий по id")]
-        [SwaggerResponse(200)]
+        [SwaggerResponse(200, Type = typeof(CriterionBody))]
         [SwaggerResponse(404, Description = "Неверный идентификатор")]
 
         public async Task<IActionResult> GetById(Guid criterionId)
         {
             var result = await _criterionRepository.GetAsync(criterionId);
-            return result == null ? NotFound() : Ok();
+            return result == null ? NotFound() : Ok(result.ToCriterionBody());
         }
 
         [HttpDelete("criterion/{criterionId}"), Authorize(Roles = nameof(UserRole.Appraiser))]

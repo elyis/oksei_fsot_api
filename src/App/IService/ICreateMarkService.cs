@@ -5,6 +5,6 @@ namespace oksei_fsot_api.src.App.IService
 {
     public interface ICreateMarkService
     {
-        Task<IActionResult> Invoke(CreateMarkBody createMarkBody, Guid criterionId, Guid appraiserId);
+        Task<IActionResult> Invoke(CreateMarkBody createMarkBody, Guid criterionEvaluationId, Guid appraiserId);
     }
 }

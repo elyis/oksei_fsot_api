@@ -71,6 +71,7 @@ namespace oksei_fsot_api.src.Infrastructure.Repository
                 .Include(e => e.Reports)
                 .Include(e => e.UserAppraisers)
                     .ThenInclude(e => e.Marks)
+                        .ThenInclude(e => e.Evaluation)
                 .Where(e =>
                     e.RoleName == rolename
                 )
@@ -94,7 +95,7 @@ namespace oksei_fsot_api.src.Infrastructure.Repository
                     .Where(e =>
                         e.Date.Month == monthIndex &&
                         e.Date.Year == year)
-                    .Sum(e => e.Value),
+                    .Sum(e => e.Evaluation.CountPoints),
 
                 LastAssessment = teacher.UserAppraisers
                     .SelectMany(e => e.Marks)
@@ -147,7 +148,7 @@ namespace oksei_fsot_api.src.Infrastructure.Repository
                     .Where(e =>
                         e.Date.Month == monthIndex &&
                         e.Date.Year == year)
-                    .Sum(e => e.Value),
+                    .Sum(e => e.Evaluation.CountPoints),
                 LastAssessment = teacher.UserAppraisers
                     .SelectMany(e => e.Marks)
                     .Where(e =>
