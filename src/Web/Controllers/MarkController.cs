@@ -34,7 +34,7 @@ namespace oksei_fsot_api.src.Web.Controllers
             _jwtService = jwtService;
         }
 
-        [HttpPost("mark/{criterionId}"), Authorize(Roles = nameof(UserRole.Appraiser))]
+        [HttpPost("mark/{criterionEvaluationId}"), Authorize(Roles = nameof(UserRole.Appraiser))]
         [SwaggerOperation("Оценить по критерию")]
         [SwaggerResponse(200)]
         [SwaggerResponse(400, Description = "Неверный идентификатор оцениваемого")]
@@ -52,7 +52,7 @@ namespace oksei_fsot_api.src.Web.Controllers
         }
 
 
-        [HttpGet("marks/{loginTeacher}/{monthIndex}")]
+        [HttpGet("marks/{loginTeacher}")]
         [SwaggerOperation("Получить список оценок учителя за месяц")]
         [SwaggerResponse(200, Type = typeof(IEnumerable<MarkBody>))]
         [SwaggerResponse(400, Description = "Неверный индекс месяца, должен быть от 1 до 11")]
