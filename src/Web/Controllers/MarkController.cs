@@ -34,7 +34,7 @@ namespace oksei_fsot_api.src.Web.Controllers
             _jwtService = jwtService;
         }
 
-        [HttpPost("mark/{criterionEvaluationId}"), Authorize(Roles = nameof(UserRole.Appraiser))]
+        [HttpPost("mark"), Authorize(Roles = nameof(UserRole.Appraiser))]
         [SwaggerOperation("Оценить по критерию")]
         [SwaggerResponse(200)]
         [SwaggerResponse(400, Description = "Неверный идентификатор оцениваемого")]
