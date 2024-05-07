@@ -36,7 +36,7 @@ namespace oksei_fsot_api.src.Web.Controllers
 
         [HttpPost("mark"), Authorize(Roles = nameof(UserRole.Appraiser))]
         [SwaggerOperation("Оценить по критерию")]
-        [SwaggerResponse(200)]
+        [SwaggerResponse(200, Type = typeof(MarkBody))]
         [SwaggerResponse(400, Description = "Неверный идентификатор оцениваемого")]
         [SwaggerResponse(404, Description = "Неверный идентификатор критерия")]
 

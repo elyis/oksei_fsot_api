@@ -51,7 +51,7 @@ namespace oksei_fsot_api.src.App.Service
                 return new BadRequestResult();
 
             var log = await _markLogRepository.AddAsync(result);
-            return new OkResult();
+            return new OkObjectResult(result.ToMarkBody());
         }
     }
 }
