@@ -17,7 +17,7 @@ namespace oksei_fsot_api.src.Domain.Models
         {
             return new MarkBody
             {
-                Id = Id,
+                CriterionId = EvaluationOption.CriterionId,
                 Date = CreatedAt.ToShortDateString(),
                 EvaluationId = EvaluationOptionId,
                 AppraiserName = EvaluatedAppraiser.Appraiser.Fullname

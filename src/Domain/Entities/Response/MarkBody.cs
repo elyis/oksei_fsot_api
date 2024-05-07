@@ -4,7 +4,7 @@ namespace oksei_fsot_api.src.Domain.Entities.Response
 {
     public class MarkBody
     {
-        public Guid Id { get; set; }
+        public Guid CriterionId { get; set; }
         public string AppraiserName { get; set; }
 
         [DataType(DataType.Date)]

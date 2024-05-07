@@ -36,15 +36,16 @@ namespace oksei_fsot_api.src.Infrastructure.Repository
             => await _context.Marks
                 .Include(e => e.EvaluatedAppraiser)
                     .ThenInclude(e => e.Appraiser)
+                .Include(e => e.EvaluationOption)
                 .FirstOrDefaultAsync(e => e.Id == id);
 
-        public async Task<MarkModel?> GetAsync(Guid criterionId, Guid teacherId, int monthIndex, int year)
+        public async Task<MarkModel?> GetAsync(Guid evaluationOptionId, Guid teacherId, int monthIndex, int year)
         {
             return await _context.Marks
                 .Include(e => e.EvaluatedAppraiser)
                 .Include(e => e.EvaluationOption)
                 .FirstOrDefaultAsync(e =>
-                    e.EvaluationOption.CriterionId == criterionId &&
+                    e.EvaluationOptionId == evaluationOptionId &&
                     e.EvaluatedAppraiser.EvaluatedId == teacherId &&
                     e.CreatedAt.Month == monthIndex &&
                     e.CreatedAt.Year == year
@@ -56,6 +57,7 @@ namespace oksei_fsot_api.src.Infrastructure.Repository
             var marks = await _context.Marks
                 .Include(e => e.EvaluatedAppraiser.Evaluated)
                 .Include(e => e.EvaluatedAppraiser.Appraiser)
+                .Include(e => e.EvaluationOption)
                 .Where(e =>
                     e.CreatedAt.Year == year &&
                     e.CreatedAt.Month == monthIndex &&
@@ -69,6 +71,7 @@ namespace oksei_fsot_api.src.Infrastructure.Repository
             var marks = await _context.Marks
                 .Include(e => e.EvaluatedAppraiser.Evaluated)
                 .Include(e => e.EvaluatedAppraiser.Appraiser)
+                .Include(e => e.EvaluationOption)
                 .Where(e =>
                     e.CreatedAt.Month == monthIndex &&
                     e.CreatedAt.Year == year

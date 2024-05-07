@@ -34,7 +34,7 @@ namespace oksei_fsot_api.src.App.Service
             if (criterionEvaluation == null)
                 return new NotFoundResult();
 
-            var evaluationPerson = await _userRepository.GetAsync(createMarkBody.EvaluatedPersonId);
+            var evaluationPerson = await _userRepository.GetAsync(createMarkBody.EvaluationLogin);
             if (evaluationPerson == null)
                 return new BadRequestResult();
 
@@ -42,7 +42,7 @@ namespace oksei_fsot_api.src.App.Service
             var evaluatedAppraiser = await _evaluatedAppraiserRepository.AddOrGetAsync(appraiser, evaluationPerson);
             var date = DateTime.UtcNow;
 
-            var mark = await _markRepository.GetAsync(createMarkBody.CriterionId, createMarkBody.EvaluationId, date.Month, date.Year);
+            var mark = await _markRepository.GetAsync(createMarkBody.EvaluationId, createMarkBody.EvaluationId, date.Month, date.Year);
             if (mark != null)
                 return new ConflictResult();
 
