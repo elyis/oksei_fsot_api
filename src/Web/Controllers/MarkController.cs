@@ -42,12 +42,11 @@ namespace oksei_fsot_api.src.Web.Controllers
 
         public async Task<IActionResult> CreateMark(
             [FromHeader(Name = "Authorization")] string token,
-            CreateMarkBody markBody,
-            [FromQuery, Required] Guid criterionEvaluationId
+            CreateMarkBody markBody
         )
         {
             var tokenInfo = _jwtService.GetTokenInfo(token);
-            var responseStatusCode = await _createMarkService.Invoke(markBody, criterionEvaluationId, tokenInfo.UserId);
+            var responseStatusCode = await _createMarkService.Invoke(markBody, tokenInfo.UserId);
             return responseStatusCode;
         }
 
@@ -57,19 +56,20 @@ namespace oksei_fsot_api.src.Web.Controllers
         [SwaggerResponse(200, Type = typeof(IEnumerable<MarkBody>))]
         [SwaggerResponse(400, Description = "Неверный индекс месяца, должен быть от 1 до 11")]
         [SwaggerResponse(404, Description = "Несуществующий логин")]
+        [SwaggerResponse(409, Description = "Оценивание уже было")]
 
 
         public async Task<IActionResult> GetMarksByMonth(
             [Range(1, 12), FromQuery, Required] int monthIndex,
-            [FromQuery, Required] string loginTeacher,
-            [FromQuery, Required] int year
+            string loginTeacher
         )
         {
             var teacher = await _userRepository.GetAsync(loginTeacher);
             if (teacher == null)
                 return NotFound();
 
-            var marksByMonth = await _markRepository.GetMarksByMonth(teacher.Id, monthIndex, year);
+            var date = DateTime.UtcNow;
+            var marksByMonth = await _markRepository.GetMarksByMonth(teacher.Id, monthIndex, date.Year);
             var result = marksByMonth.Select(e => e.ToMarkBody());
             return Ok(result);
         }

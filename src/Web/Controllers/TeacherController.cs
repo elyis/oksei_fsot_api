@@ -1,7 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using oksei_fsot_api.src.Domain.Entities.Response;
-using oksei_fsot_api.src.Domain.Enums;
 using oksei_fsot_api.src.Domain.IRepository;
 using Swashbuckle.AspNetCore.Annotations;
 using webApiTemplate.src.App.IService;
@@ -28,13 +27,13 @@ namespace oksei_fsot_api.src.Web.Controllers
         [SwaggerResponse(200, Type = typeof(IEnumerable<TeacherBody>))]
         public async Task<IActionResult> GetAllTeacher(
             [FromHeader(Name = "Authorization")] string token,
-            [FromQuery, Range(1, 12)] int monthIndex,
-            [FromQuery] int year
+            [FromQuery, Range(1, 12)] int monthIndex
         )
         {
             var tokenInfo = _jwtService.GetTokenInfo(token);
 
-            var teacherRating = await _userRepository.GetTeacherRatingSummariesAsync(monthIndex, year);
+            var date = DateTime.UtcNow;
+            var teacherRating = await _userRepository.GetTeacherRatingSummariesAsync(monthIndex, date.Year);
             var teachers = teacherRating.Select(e =>
             new TeacherBody
             {

@@ -5,10 +5,11 @@ namespace oksei_fsot_api.src.Domain.Models
     public class MarkModel
     {
         public Guid Id { get; set; }
-        public DateOnly Date { get; set; } = DateOnly.FromDateTime(DateTime.Now);
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-        public Guid EvaluationId { get; set; }
-        public CriterionEvaluationOption Evaluation { get; set; }
+        public Guid EvaluationOptionId { get; set; }
+        public CriterionEvaluationOption EvaluationOption { get; set; }
+        public Guid EvaluatedAppraiserId { get; set; }
         public EvaluatedAppraiserModel EvaluatedAppraiser { get; set; }
         public MarkLogModel MarkLogs { get; set; }
 
@@ -17,8 +18,8 @@ namespace oksei_fsot_api.src.Domain.Models
             return new MarkBody
             {
                 Id = Id,
-                Date = Date,
-                EvaluationId = EvaluationId,
+                Date = CreatedAt.ToShortDateString(),
+                EvaluationId = EvaluationOptionId,
                 AppraiserName = EvaluatedAppraiser.Appraiser.Fullname
             };
         }

@@ -28,20 +28,21 @@ namespace oksei_fsot_api.src.App.Service
             _evaluatedAppraiserRepository = evaluatedAppraiserRepository;
         }
 
-        public async Task<IActionResult> Invoke(CreateMarkBody createMarkBody, Guid criterionEvaluationId, Guid appraiserId)
+        public async Task<IActionResult> Invoke(CreateMarkBody createMarkBody, Guid appraiserId)
         {
-            var criterionEvaluation = await _criterionRepository.GetCriterionEvaluationOptionAsync(criterionEvaluationId);
+            var criterionEvaluation = await _criterionRepository.GetCriterionEvaluationOptionAsync(createMarkBody.EvaluationId);
             if (criterionEvaluation == null)
                 return new NotFoundResult();
 
-            var evaluatedUser = await _userRepository.GetAsync(createMarkBody.EvaluatedId);
-            if (evaluatedUser == null)
+            var evaluationPerson = await _userRepository.GetAsync(createMarkBody.EvaluatedPersonId);
+            if (evaluationPerson == null)
                 return new BadRequestResult();
 
             var appraiser = await _userRepository.GetAsync(appraiserId);
-            var evaluatedAppraiser = await _evaluatedAppraiserRepository.AddOrGetAsync(appraiser, evaluatedUser);
+            var evaluatedAppraiser = await _evaluatedAppraiserRepository.AddOrGetAsync(appraiser, evaluationPerson);
+            var date = DateTime.UtcNow;
 
-            var mark = await _markRepository.GetAsync(criterionEvaluationId, evaluatedUser.Id, createMarkBody.Date.Month, createMarkBody.Date.Year);
+            var mark = await _markRepository.GetAsync(createMarkBody.CriterionId, createMarkBody.EvaluationId, date.Month, date.Year);
             if (mark != null)
                 return new ConflictResult();
 

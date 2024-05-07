@@ -71,7 +71,7 @@ namespace oksei_fsot_api.src.Infrastructure.Repository
                 .Include(e => e.Reports)
                 .Include(e => e.UserAppraisers)
                     .ThenInclude(e => e.Marks)
-                        .ThenInclude(e => e.Evaluation)
+                        .ThenInclude(e => e.EvaluationOption)
                 .Where(e =>
                     e.RoleName == rolename
                 )
@@ -93,17 +93,18 @@ namespace oksei_fsot_api.src.Infrastructure.Repository
                 TotalRating = teacher.UserAppraisers
                     .SelectMany(e => e.Marks)
                     .Where(e =>
-                        e.Date.Month == monthIndex &&
-                        e.Date.Year == year)
-                    .Sum(e => e.Evaluation.CountPoints),
+                        e.CreatedAt.Month == monthIndex &&
+                        e.CreatedAt.Year == year)
+                    .Sum(e => e.EvaluationOption.CountPoints),
 
                 LastAssessment = teacher.UserAppraisers
                     .SelectMany(e => e.Marks)
                     .Where(e =>
-                        e.Date.Month == monthIndex &&
-                        e.Date.Year == year)
-                    .OrderByDescending(e => e.Date)
-                    .FirstOrDefault()?.Date,
+                        e.CreatedAt.Month == monthIndex &&
+                        e.CreatedAt.Year == year)
+                    .OrderByDescending(e => e.CreatedAt)
+                    .FirstOrDefault()?.CreatedAt
+                    .ToShortDateString(),
             })
             .OrderByDescending(e => e.TotalRating)
             .ToList();
@@ -146,16 +147,17 @@ namespace oksei_fsot_api.src.Infrastructure.Repository
                 TotalRating = teacher.UserAppraisers
                     .SelectMany(e => e.Marks)
                     .Where(e =>
-                        e.Date.Month == monthIndex &&
-                        e.Date.Year == year)
-                    .Sum(e => e.Evaluation.CountPoints),
+                        e.CreatedAt.Month == monthIndex &&
+                        e.CreatedAt.Year == year)
+                    .Sum(e => e.EvaluationOption.CountPoints),
                 LastAssessment = teacher.UserAppraisers
                     .SelectMany(e => e.Marks)
                     .Where(e =>
-                        e.Date.Month == monthIndex &&
-                        e.Date.Year == year)
-                    .OrderByDescending(e => e.Date)
-                    .FirstOrDefault()?.Date,
+                        e.CreatedAt.Month == monthIndex &&
+                        e.CreatedAt.Year == year)
+                    .OrderByDescending(e => e.CreatedAt)
+                    .FirstOrDefault()?.CreatedAt
+                    .ToShortDateString(),
                 Login = teacher.Login
             })
             .OrderByDescending(e => e.TotalRating)

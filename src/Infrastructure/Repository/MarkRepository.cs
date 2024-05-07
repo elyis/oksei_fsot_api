@@ -19,12 +19,11 @@ namespace oksei_fsot_api.src.Infrastructure.Repository
             CriterionEvaluationOption evaluationOption,
             EvaluatedAppraiserModel evaluatedAppraiser,
             CreateMarkBody markBody
-            )
+        )
         {
             var mark = new MarkModel
             {
-                Evaluation = evaluationOption,
-                Date = markBody.Date,
+                EvaluationOption = evaluationOption,
                 EvaluatedAppraiser = evaluatedAppraiser,
             };
 
@@ -43,12 +42,12 @@ namespace oksei_fsot_api.src.Infrastructure.Repository
         {
             return await _context.Marks
                 .Include(e => e.EvaluatedAppraiser)
-                .Include(e => e.Evaluation)
+                .Include(e => e.EvaluationOption)
                 .FirstOrDefaultAsync(e =>
-                    e.Evaluation.CriterionId == criterionId &&
+                    e.EvaluationOption.CriterionId == criterionId &&
                     e.EvaluatedAppraiser.EvaluatedId == teacherId &&
-                    e.Date.Month == monthIndex &&
-                    e.Date.Year == year
+                    e.CreatedAt.Month == monthIndex &&
+                    e.CreatedAt.Year == year
             );
         }
 
@@ -58,8 +57,8 @@ namespace oksei_fsot_api.src.Infrastructure.Repository
                 .Include(e => e.EvaluatedAppraiser.Evaluated)
                 .Include(e => e.EvaluatedAppraiser.Appraiser)
                 .Where(e =>
-                    e.Date.Year == year &&
-                    e.Date.Month == monthIndex &&
+                    e.CreatedAt.Year == year &&
+                    e.CreatedAt.Month == monthIndex &&
                     e.EvaluatedAppraiser.Evaluated.Id == userId)
                 .ToListAsync();
             return marks;
@@ -71,8 +70,8 @@ namespace oksei_fsot_api.src.Infrastructure.Repository
                 .Include(e => e.EvaluatedAppraiser.Evaluated)
                 .Include(e => e.EvaluatedAppraiser.Appraiser)
                 .Where(e =>
-                    e.Date.Month == monthIndex &&
-                    e.Date.Year == year
+                    e.CreatedAt.Month == monthIndex &&
+                    e.CreatedAt.Year == year
                 )
                 .ToListAsync();
             return marks;
