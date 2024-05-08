@@ -42,7 +42,7 @@ namespace oksei_fsot_api.src.App.Service
             var evaluatedAppraiser = await _evaluatedAppraiserRepository.AddOrGetAsync(appraiser, evaluationPerson);
             var date = DateTime.UtcNow;
 
-            var mark = await _markRepository.GetAsync(createMarkBody.EvaluationId, evaluationPerson.Id, date.Month, date.Year);
+            var mark = await _markRepository.GetAsync(criterionEvaluation.CriterionId, evaluationPerson.Id, date.Month, date.Year);
             if (mark != null)
                 await _markRepository.RemoveAsync(mark.Id);
 
