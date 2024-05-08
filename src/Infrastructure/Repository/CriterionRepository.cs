@@ -117,8 +117,8 @@ namespace oksei_fsot_api.src.Infrastructure.Repository
 
         public async Task<float> GetCountPointsByCriterions()
         {
-            var countPoints = await _context.CriterionEvaluationOptions.SumAsync(e => e.CountPoints);
-            return countPoints;
+            var criterions = await _context.Criterions.Include(e => e.EvaluationOptions).ToListAsync();
+            return criterions.Sum(criterion => criterion.EvaluationOptions.Max(e => e.CountPoints));
         }
     }
 }

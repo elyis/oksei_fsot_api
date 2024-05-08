@@ -45,6 +45,7 @@ namespace oksei_fsot_api.src.Web.Controllers
             var CreateMonthStats = (IEnumerable<TeacherRatingSummary> ratings, bool isUnderway, int monthIndex) =>
             {
                 var monthName = CultureInfo.GetCultureInfo("ru-RU").DateTimeFormat.GetMonthName(monthIndex);
+                var maxCountPoints = ratings.Count() * countPointsByCriterions;
 
                 return new MonthStatsBody
                 {
@@ -53,7 +54,7 @@ namespace oksei_fsot_api.src.Web.Controllers
                     Month = monthIndex,
                     UnderWay = isUnderway,
                     LastChange = ratings.OrderByDescending(e => e.LastAssessment).FirstOrDefault()?.LastAssessment,
-                    Progress = (float)Math.Floor((float)ratings.Sum(e => e.TotalRating) / (ratings.Count() * countPointsByCriterions) * 100f)
+                    Progress = maxCountPoints > 0 ? (float)ratings.Sum(e => e.TotalRating) / maxCountPoints * 100f : 0
                 };
             };
 
