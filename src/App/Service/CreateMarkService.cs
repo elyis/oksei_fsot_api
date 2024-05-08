@@ -44,7 +44,7 @@ namespace oksei_fsot_api.src.App.Service
 
             var mark = await _markRepository.GetAsync(createMarkBody.EvaluationId, createMarkBody.EvaluationId, date.Month, date.Year);
             if (mark != null)
-                return new ConflictResult();
+                await _markRepository.RemoveAsync(mark.Id);
 
             var result = await _markRepository.AddAsync(criterionEvaluation, evaluatedAppraiser, createMarkBody);
             if (result == null)

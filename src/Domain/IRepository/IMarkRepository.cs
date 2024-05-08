@@ -6,7 +6,8 @@ namespace oksei_fsot_api.src.Domain.IRepository
     public interface IMarkRepository
     {
         Task<MarkModel?> AddAsync(CriterionEvaluationOption evaluationOption, EvaluatedAppraiserModel evaluatedAppraiser, CreateMarkBody markBody);
-        Task<MarkModel?> GetAsync(Guid id);
+        Task<MarkModel?> GetByCriterionIdAsync(Guid id);
+        Task<bool> RemoveAsync(Guid id);
         Task<List<MarkModel>> GetMarksByMonth(Guid userId, int monthIndex, int year);
         Task<List<MarkModel>> GetMarksByMonth(int monthIndex, int year);
         Task<MarkModel?> GetAsync(Guid evaluationOptionId, Guid teacherId, int monthIndex, int year);

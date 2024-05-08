@@ -32,12 +32,23 @@ namespace oksei_fsot_api.src.Infrastructure.Repository
             return result?.Entity;
         }
 
-        public async Task<MarkModel?> GetAsync(Guid id)
+        public async Task<MarkModel?> GetByCriterionIdAsync(Guid criterionId)
             => await _context.Marks
                 .Include(e => e.EvaluatedAppraiser)
                     .ThenInclude(e => e.Appraiser)
                 .Include(e => e.EvaluationOption)
-                .FirstOrDefaultAsync(e => e.Id == id);
+                .FirstOrDefaultAsync(e => e.EvaluationOption.CriterionId == criterionId);
+
+        public async Task<bool> RemoveAsync(Guid id)
+        {
+            var mark = await _context.Marks.FirstOrDefaultAsync(e => e.Id == id);
+            if (mark != null)
+            {
+                _context.Marks.Remove(mark);
+                await _context.SaveChangesAsync();
+            }
+            return true;
+        }
 
         public async Task<MarkModel?> GetAsync(Guid evaluationOptionId, Guid teacherId, int monthIndex, int year)
         {
