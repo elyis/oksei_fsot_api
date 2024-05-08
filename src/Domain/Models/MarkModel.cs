@@ -9,7 +9,6 @@ namespace oksei_fsot_api.src.Domain.Models
 
         public Guid EvaluationOptionId { get; set; }
         public CriterionEvaluationOption EvaluationOption { get; set; }
-        public Guid EvaluatedAppraiserId { get; set; }
         public EvaluatedAppraiserModel EvaluatedAppraiser { get; set; }
         public MarkLogModel MarkLogs { get; set; }
 

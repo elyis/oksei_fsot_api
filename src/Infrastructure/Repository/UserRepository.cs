@@ -56,6 +56,7 @@ namespace oksei_fsot_api.src.Infrastructure.Repository
             var users = await _context.Users
                 .Include(e => e.UserAppraisers)
                     .ThenInclude(e => e.Marks)
+                        .ThenInclude(e => e.EvaluationOption)
                 .Where(e =>
                     e.RoleName == rolename
                 )
@@ -83,7 +84,6 @@ namespace oksei_fsot_api.src.Infrastructure.Repository
         public async Task<List<TeacherRatingSummary>> GetTeacherRatingSummariesAsync(int monthIndex, int year)
         {
             var teachers = await GetUsersWithMarksByRoleAndMonth(UserRole.Teacher);
-
             var rating = teachers.Select(teacher =>
             new TeacherRatingSummary
             {
