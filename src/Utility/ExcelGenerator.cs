@@ -1,5 +1,6 @@
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
+using SQLitePCL;
 
 namespace oksei_fsot_api.src.Utility
 {
@@ -13,7 +14,7 @@ namespace oksei_fsot_api.src.Utility
         {
             return await Task.Run(() =>
             {
-                if (!filename.EndsWith(".xlsx") || File.Exists($"{pathToStorage}{filename}"))
+                if (!filename.EndsWith(".xlsx"))
                     return false;
 
                 if (!Directory.Exists(pathToStorage))
@@ -40,6 +41,17 @@ namespace oksei_fsot_api.src.Utility
             });
         }
 
+        public async Task<byte[]?> GetExcelAsync(string pathToStorage, string filename)
+        {
+            var fullpath = $"{pathToStorage}{filename}";
+            if (!File.Exists(fullpath))
+                return null;
+
+            using Stream fileStream = File.OpenRead(fullpath);
+            using var memoryStream = new MemoryStream();
+            await fileStream.CopyToAsync(memoryStream);
+            return memoryStream.ToArray();
+        }
 
         private ICellStyle CreateCellStyle(XSSFWorkbook workbook)
         {

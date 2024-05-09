@@ -1,3 +1,6 @@
+using oksei_fsot_api.src.Domain.Entities.Request;
+using oksei_fsot_api.src.Domain.Entities.Response;
+
 namespace oksei_fsot_api.src.Domain.Models
 {
     public class PremiumReportModel
@@ -13,5 +16,34 @@ namespace oksei_fsot_api.src.Domain.Models
         public string? FileName { get; set; }
 
         public List<ReportTeacherModel> ReportTeachers { get; set; } = new();
+
+        public ReportData ToReportData()
+        {
+            return new ReportData
+            {
+                TotalAmountPremium = TotalAmountPremium,
+                CostByPoint = CostByPoint,
+                DistributablePremium = DistributablePremium,
+                FixedPremium = FixedPremium,
+                PartSemiannualPremium = PartSemiannualPremium,
+                TotalAmountPoints = TotalAmountPoints,
+            };
+        }
+
+        public ReportBody ToReportBody()
+        {
+            return new ReportBody
+            {
+                ReportData = ToReportData(),
+                TeacherPerformanceSummaries = ReportTeachers.Select(e => new TeacherPerformanceSummary
+                {
+                    Fullname = e.User.Fullname,
+                    CountPoints = e.CountPoints,
+                    Premium = e.Premium,
+                })
+                .ToList(),
+                UrlReport = FileName == null ? null : $"{Constants.webPathToReports}{FileName}",
+            };
+        }
     }
 }

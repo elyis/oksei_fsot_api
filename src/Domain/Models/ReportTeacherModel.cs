@@ -1,3 +1,5 @@
+using oksei_fsot_api.src.Domain.Entities.Response;
+
 namespace oksei_fsot_api.src.Domain.Models
 {
     public class ReportTeacherModel
@@ -12,5 +14,15 @@ namespace oksei_fsot_api.src.Domain.Models
 
         public PremiumReportModel PremiumReport { get; set; }
         public Guid PremiumReportId { get; set; }
+
+        public ReportTeacherBody ToReportTeacherBody()
+        {
+            return new ReportTeacherBody
+            {
+                Fullname = User.Fullname,
+                CountPoints = CountPoints,
+                Premium = Premium,
+            };
+        }
     }
 }

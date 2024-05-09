@@ -20,6 +20,7 @@ namespace oksei_fsot_api.src.Domain.Models
         public string? Token { get; set; }
         public DateTime? TokenValidBefore { get; set; }
         public DateOnly? LastEvaluationDate { get; set; }
+        public bool IsRemoved { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public List<EvaluatedAppraiserModel> UserAppraisers { get; set; } = new();

@@ -36,21 +36,22 @@ namespace oksei_fsot_api.src.Infrastructure.Repository
             return result?.Entity;
         }
 
-        public async Task<UserModel?> GetAsync(Guid id)
+        public async Task<UserModel?> GetAsync(Guid id, bool IsRemoved = false)
             => await _context.Users
-                .FirstOrDefaultAsync(e => e.Id == id);
+                .FirstOrDefaultAsync(e => e.Id == id && e.IsRemoved == IsRemoved);
 
-        public async Task<UserModel?> GetAsync(string login)
+        public async Task<UserModel?> GetAsync(string login, bool IsRemoved = false)
             => await _context.Users
-                .FirstOrDefaultAsync(e => e.Login == login);
+                .FirstOrDefaultAsync(e => e.Login == login && e.IsRemoved == IsRemoved);
 
-        public async Task<UserModel?> GetByTokenAsync(string refreshTokenHash)
+        public async Task<UserModel?> GetByTokenAsync(string refreshTokenHash, bool IsRemoved = false)
             => await _context.Users
                 .FirstOrDefaultAsync(e =>
-                e.Token == refreshTokenHash
+                e.Token == refreshTokenHash &&
+                e.IsRemoved == IsRemoved
             );
 
-        public async Task<List<UserModel>> GetUsersWithMarksByRoleAndMonth(UserRole role)
+        public async Task<List<UserModel>> GetUsersWithMarksByRoleAndMonth(UserRole role, bool IsRemoved = false)
         {
             var rolename = Enum.GetName(typeof(UserRole), role);
             var users = await _context.Users
@@ -58,14 +59,15 @@ namespace oksei_fsot_api.src.Infrastructure.Repository
                     .ThenInclude(e => e.Marks)
                         .ThenInclude(e => e.EvaluationOption)
                 .Where(e =>
-                    e.RoleName == rolename
+                    e.RoleName == rolename &&
+                    e.IsRemoved == IsRemoved
                 )
                 .ToListAsync();
 
             return users;
         }
 
-        public async Task<List<UserModel>> GetUsersWithMarksAndReportsByRoleAndMonth(UserRole role)
+        public async Task<List<UserModel>> GetUsersWithMarksAndReportsByRoleAndMonth(UserRole role, bool IsRemoved = false)
         {
             var rolename = Enum.GetName(typeof(UserRole), role);
             var users = await _context.Users
@@ -74,7 +76,8 @@ namespace oksei_fsot_api.src.Infrastructure.Repository
                     .ThenInclude(e => e.Marks)
                         .ThenInclude(e => e.EvaluationOption)
                 .Where(e =>
-                    e.RoleName == rolename
+                    e.RoleName == rolename &&
+                    e.IsRemoved == IsRemoved
                 )
                 .ToListAsync();
 
@@ -135,7 +138,7 @@ namespace oksei_fsot_api.src.Infrastructure.Repository
             return teacherPerformanceSummaries;
         }
 
-        public async Task<IEnumerable<TeacherPerformanceSummary>> UpdateTeacherPerformanceSummary(int monthIndex, ReportData reportData, int year)
+        public async Task<IEnumerable<TeacherPerformanceSummary>> UpdateTeacherPerformanceSummary(int monthIndex, ReportData reportData, int year, string filename)
         {
             var teachers = await GetUsersWithMarksAndReportsByRoleAndMonth(UserRole.Teacher);
             var currentYear = DateTime.UtcNow.Year;
@@ -158,7 +161,7 @@ namespace oksei_fsot_api.src.Infrastructure.Repository
                     .OrderByDescending(e => e.CreatedAt)
                     .FirstOrDefault()?.CreatedAt
                     .ToShortDateString(),
-                Login = teacher.Login
+                Login = teacher.Login,
             })
             .OrderByDescending(e => e.TotalRating)
             .ToList();
@@ -171,32 +174,6 @@ namespace oksei_fsot_api.src.Infrastructure.Repository
                     Premium = (int)teacher.TotalRating * reportData.CostByPoint + reportData.FixedPremium
                 });
 
-            var teacherReports = new List<ReportTeacherModel>();
-            var newReports = teachers.Select(teacher =>
-            {
-                var reports = teacher.Reports.Where(e => e.Date.Month == monthIndex);
-                var teacherSummary = teacherPerformanceSummaries.First(e => e.Fullname == teacher.Fullname);
-
-                var newReport = new ReportTeacherModel
-                {
-                    User = teacher,
-                    CountPoints = teacherSummary.CountPoints,
-                    Premium = teacherSummary.Premium,
-                };
-
-                if (reports.Any())
-                {
-                    var existReport = reports.First();
-                    teacherReports.Add(existReport);
-                    existReport.Premium = teacherSummary.Premium;
-                    existReport.CountPoints = teacherSummary.CountPoints;
-                }
-
-                return newReport;
-            })
-            .ToList();
-
-            teacherReports.AddRange(newReports);
             var premiumReport = await _context.PremiumReports
                         .FirstOrDefaultAsync(e =>
                             e.Date.Month == monthIndex &&
@@ -211,14 +188,36 @@ namespace oksei_fsot_api.src.Infrastructure.Repository
                 PartSemiannualPremium = reportData.PartSemiannualPremium,
                 TotalAmountPoints = reportData.TotalAmountPoints,
                 TotalAmountPremium = reportData.TotalAmountPremium,
-                ReportTeachers = teacherReports
+                FileName = filename
             };
 
-            if (premiumReport == null)
-                await _context.PremiumReports.AddAsync(newPremiumReport);
-            else
-                premiumReport = newPremiumReport;
+            if (premiumReport != null)
+                _context.PremiumReports.Remove(premiumReport);
 
+            premiumReport = (await _context.PremiumReports.AddAsync(newPremiumReport)).Entity;
+
+            var teacherReports = new List<ReportTeacherModel>();
+            var newReports = teachers.Select(teacher =>
+            {
+                var reports = teacher.Reports.Where(e => e.Date.Month == monthIndex && e.Date.Year == year);
+                var teacherSummary = teacherPerformanceSummaries.First(e => e.Fullname == teacher.Fullname);
+
+                var newReport = new ReportTeacherModel
+                {
+                    User = teacher,
+                    CountPoints = teacherSummary.CountPoints,
+                    Premium = teacherSummary.Premium,
+                    PremiumReport = premiumReport,
+                };
+
+                if (reports.Any())
+                    _context.ReportTeachers.RemoveRange(reports);
+
+                return newReport;
+            })
+            .ToList();
+
+            teacherReports.AddRange(newReports);
             await _context.ReportTeachers.AddRangeAsync(newReports);
             await _context.SaveChangesAsync();
             return teacherPerformanceSummaries;
@@ -238,22 +237,24 @@ namespace oksei_fsot_api.src.Infrastructure.Repository
             await _context.SaveChangesAsync();
             return newRefreshToken;
         }
-
-
         public async Task<bool> RemoveAsync(string login)
         {
             var user = await GetAsync(login);
             if (user == null)
                 return true;
 
-            var result = _context.Users.Remove(user);
+            user.IsRemoved = true;
             await _context.SaveChangesAsync();
-            return result != null;
+
+            return user.IsRemoved;
         }
 
-        public async Task<IEnumerable<UserModel>> GetUsers()
+        public async Task<IEnumerable<UserModel>> GetUsers(IEnumerable<UserRole> roles, bool IsRemoved = false)
         {
-            return await _context.Users.ToListAsync();
+            var roleString = roles.Select(e => e.ToString());
+            return await _context.Users
+                .Where(e => e.IsRemoved == IsRemoved && roleString.Contains(e.RoleName))
+                .ToListAsync();
         }
     }
 }

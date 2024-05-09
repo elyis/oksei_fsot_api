@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using oksei_fsot_api.src.Domain.Entities.Response;
+using oksei_fsot_api.src.Domain.Enums;
 using oksei_fsot_api.src.Domain.IRepository;
 using Swashbuckle.AspNetCore.Annotations;
 using webApiTemplate.src.App.IService;
@@ -56,7 +57,12 @@ namespace oksei_fsot_api.src.Web.Controllers
         [SwaggerResponse(200, Type = typeof(IEnumerable<UserOpenInfoBody>))]
         public async Task<IActionResult> GetTeachers()
         {
-            var users = await _userRepository.GetUsers();
+            var roles = new List<UserRole>()
+            {
+                UserRole.Teacher,
+                UserRole.Director,
+            };
+            var users = await _userRepository.GetUsers(roles);
             var result = users.Select(e => e.ToUserOpenInfoBody());
             return Ok(result);
         }

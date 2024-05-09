@@ -42,17 +42,18 @@ namespace oksei_fsot_api.src.Infrastructure.Repository
             return result?.Entity;
         }
 
-        public async Task<List<CriterionModel>> GetAllAsync(int count, int offset)
+        public async Task<List<CriterionModel>> GetAllAsync(int count, int offset, bool IsRemoved = false)
             => await _context.Criterions
                 .Include(e => e.EvaluationOptions)
+                .Where(e => e.IsRemoved == IsRemoved)
                 .Skip(offset)
                 .Take(count)
                 .ToListAsync();
 
-        public async Task<CriterionModel?> GetAsync(Guid id)
+        public async Task<CriterionModel?> GetAsync(Guid id, bool isRemoved = false)
             => await _context.Criterions
                 .Include(e => e.EvaluationOptions)
-                .FirstOrDefaultAsync(e => e.Id == id);
+                .FirstOrDefaultAsync(e => e.Id == id && e.IsRemoved == isRemoved);
 
         public async Task<CriterionEvaluationOption?> GetCriterionEvaluationOptionAsync(Guid id)
         {
@@ -65,7 +66,7 @@ namespace oksei_fsot_api.src.Infrastructure.Repository
             var criterion = await GetAsync(id);
             if (criterion != null)
             {
-                _ = _context.Criterions.Remove(criterion);
+                criterion.IsRemoved = true;
                 await _context.SaveChangesAsync();
             }
             return true;
@@ -115,9 +116,12 @@ namespace oksei_fsot_api.src.Infrastructure.Repository
             return criterion;
         }
 
-        public async Task<float> GetCountPointsByCriterions()
+        public async Task<float> GetCountPointsByCriterions(bool isRemoved = false)
         {
-            var criterions = await _context.Criterions.Include(e => e.EvaluationOptions).ToListAsync();
+            var criterions = await _context.Criterions
+                .Include(e => e.EvaluationOptions)
+                .Where(e => e.IsRemoved == isRemoved)
+                .ToListAsync();
             return criterions.Sum(criterion => criterion.EvaluationOptions.Max(e => e.CountPoints));
         }
     }
