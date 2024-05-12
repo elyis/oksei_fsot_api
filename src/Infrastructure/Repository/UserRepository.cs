@@ -131,7 +131,7 @@ namespace oksei_fsot_api.src.Infrastructure.Repository
                 {
                     Fullname = teacher.User.Fullname,
                     CountPoints = teacher.CountPoints,
-                    Premium = teacher.Premium,
+                    Premium = (int)teacher.Premium,
                 })
                 .ToListAsync();
 

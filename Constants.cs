@@ -2,7 +2,7 @@ namespace oksei_fsot_api
 {
     public static class Constants
     {
-        public static readonly string serverUrl = "http://82.97.249.229";
+        public static readonly string serverUrl = "https://16fb-185-7-93-247.ngrok-free.app";
 
         public static readonly string localPathToStorages = @"Resources/";
         public static readonly string localPathToProfileIcons = $"{localPathToStorages}ProfileIcons/";

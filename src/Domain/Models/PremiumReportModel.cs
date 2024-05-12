@@ -39,7 +39,7 @@ namespace oksei_fsot_api.src.Domain.Models
                 {
                     Fullname = e.User.Fullname,
                     CountPoints = e.CountPoints,
-                    Premium = e.Premium,
+                    Premium = (int)e.Premium,
                 })
                 .ToList(),
                 UrlReport = FileName == null ? null : $"{Constants.webPathToReports}{FileName}",
