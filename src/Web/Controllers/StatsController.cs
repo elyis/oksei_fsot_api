@@ -50,7 +50,7 @@ namespace oksei_fsot_api.src.Web.Controllers
                 return new MonthStatsBody
                 {
                     Name = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(monthName),
-                    RatingTeachers = ratings.Select(e => e.TeacherFullname).ToList(),
+                    RatingTeachers = ratings.Select(e => e.TeacherFullname).Take(5).ToList(),
                     Month = monthIndex,
                     UnderWay = isUnderway,
                     LastChange = ratings.OrderByDescending(e => e.LastAssessment).FirstOrDefault()?.LastAssessment,
