@@ -56,7 +56,7 @@ namespace oksei_fsot_api.src.Web.Controllers
             var password = _passwordGenerator.Invoke();
             var signUpBody = new SignUpBody
             {
-                Fullname = body.Fullname,
+                Fullname = AbbreviateName(body.Fullname),
                 Login = login,
                 Password = password,
                 Role = body.Role
@@ -82,6 +82,15 @@ namespace oksei_fsot_api.src.Web.Controllers
             }
 
             return BadRequest();
+        }
+
+        private static string AbbreviateName(string name)
+        {
+            var names = name.Split(' ');
+            if (names.Length == 2)
+                return names[0] + " " + names[1][0] + ".";
+
+            return names[0] + " " + names[1][..1] + ". " + names[^1][..1] + ".";
         }
 
 

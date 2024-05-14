@@ -31,19 +31,10 @@ namespace oksei_fsot_api.src.Domain.Models
         {
             return new UserOpenInfoBody
             {
-                Fullname = AbbreviateName(Fullname),
+                Fullname = Fullname,
                 Login = Login,
                 Role = Enum.Parse<UserRole>(RoleName)
             };
-        }
-
-        private static string AbbreviateName(string name)
-        {
-            var names = name.Split(' ');
-            if (names.Length == 2)
-                return names[0] + " " + names[1][0] + ".";
-
-            return names[0] + " " + names[1][..1] + ". " + names[^1][..1] + ".";
         }
 
     }

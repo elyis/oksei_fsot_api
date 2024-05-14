@@ -38,7 +38,7 @@ namespace oksei_fsot_api.src.Web.Controllers
             var teachers = teacherRating.Select(e =>
             new TeacherBody
             {
-                Fullname = AbbreviateName(e.TeacherFullname),
+                Fullname = e.TeacherFullname,
                 IsKing = false,
                 LastChange = e.LastAssessment,
                 Login = e.Login,
@@ -65,16 +65,6 @@ namespace oksei_fsot_api.src.Web.Controllers
             var users = await _userRepository.GetUsers(roles);
             var result = users.Select(e => e.ToUserOpenInfoBody());
             return Ok(result);
-        }
-
-
-        private static string AbbreviateName(string name)
-        {
-            var names = name.Split(' ');
-            if (names.Length == 2)
-                return names[0] + " " + names[1][0] + ".";
-
-            return names[0] + " " + names[1][..1] + ". " + names[^1][..1] + ".";
         }
     }
 }
